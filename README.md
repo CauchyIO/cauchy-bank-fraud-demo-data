@@ -17,8 +17,20 @@ All tables land in the schema you name.
 | `mule_accounts`, `fraud_payment_beneficiaries`, `unreported_ring_payments` | `scripts/build_overlay.py` |
 
 The book holds 10,000 customers from October 2024 to September 2026. In May and June 2026 a phishing and
-bank-helpdesk wave hits the payment accounts. The overlay adds where that money went: four mule accounts of ring
-`RING-01`, a lone mule for every other case, and a few customers who paid the ring without reporting it.
+bank-helpdesk wave hits the payment accounts.
+
+A bank's own records show which customers were defrauded and which payments left their accounts, but not where the
+money went: the receiving accounts sit at other banks. The three tables of the second script, which we call the
+**overlay** because they are laid on top of the book, add that missing side:
+
+- `mule_accounts`: the accounts that received the stolen money. Four of them belong to one fraud ring, `RING-01`;
+  every other case pays a lone mule account of its own.
+- `fraud_payment_beneficiaries`: which mule account each fraudulent payment went to.
+- `unreported_ring_payments`: a few customers who also paid the ring but never reported a fraud, the victims
+  nobody has called yet.
+
+The overlay points at the book's own customers, accounts, payments and fraud cases, so the two join into one
+picture.
 
 Every table and column carries a description, and the book's tables carry informational primary and foreign keys.
 
@@ -38,15 +50,9 @@ Each script is a dry run until you add `--apply`, so run both again with it:
 1. `publish_data.py --apply` generates the book locally into `data/out/` (a few seconds), creates the schema and a
    volume `raw` if missing, uploads the Parquet files, and creates the tables, views, descriptions and keys. A
    second run finds everything in place.
-2. `build_overlay.py --apply` reads the book, builds the overlay, checks its rules and writes the three tables.
+2. `build_overlay.py --apply` reads the book, builds the overlay (the mule accounts and where each payment went),
+   checks its rules and writes the three tables.
 
 Both scripts use `--warehouse <id or name>`, else `DATABRICKS_WAREHOUSE_ID`, else your only serverless warehouse.
 
 The generator and the overlay are seeded: the same code gives the same rows every time, in any workspace.
-
-## Develop
-
-```sh
-uv run pytest                            # unit tests, no workspace needed
-uv run bankgen all --profile cauchy      # generate, load into DuckDB and run the data checks
-```
