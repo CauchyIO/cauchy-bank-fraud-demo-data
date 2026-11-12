@@ -34,6 +34,10 @@ picture.
 
 Every table and column carries a description, and the book's tables carry informational primary and foreign keys.
 
+`docs/mule-network-concepts.docx` describes the same world in prose, the way an analyst team would write it: the
+concepts of a mule-network investigation and how they relate. Upload it as context when you let an AI build the
+ontology, for example to OntoBricks' Knowledge Store.
+
 ## Run it
 
 You need [uv](https://docs.astral.sh/uv/), a Databricks CLI profile, an existing catalog you can create a schema
