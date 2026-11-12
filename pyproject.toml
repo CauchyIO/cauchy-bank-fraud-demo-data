@@ -1,0 +1,52 @@
+[project]
+name = "cauchy-bank-fraud-demo-data"
+version = "0.1.0"
+description = "Synthetic data for the Cauchy Bank fraud-ring demo: a bank's book, and the mule accounts its fraud pays into."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy==2.5.4",
+  "pyarrow==26.0.0",
+  "duckdb==1.5.6",
+  "faker==40.43.0",
+  "databricks-sdk==0.154.0",
+]
+
+[project.scripts]
+bankgen = "bankgen.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=9.1,<10",
+  "ruff>=0.17,<1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bankgen"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+testpaths = ["tests"]
+markers = [
+  "unit: fast, deterministic, no network, no files outside tmp_path",
+  "integration: full-scale generation, or needs a workspace; run by hand",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "N", "W", "SIM", "RUF"]
+ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/bankgen/validate.py" = ["E501"]
+"src/bankgen/fixtures.py" = ["E501"]
+"src/bankgen/load.py" = ["E501"]
+"src/bankgen/profiles/*.py" = ["E501"]
